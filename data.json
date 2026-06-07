@@ -1,0 +1,51 @@
+{
+  "personal": {
+    "name": "أحمد الشمري",
+    "title": "مطوّر واجهات أمامية",
+    "bio": "أبني تجارب رقمية استثنائية بشغف التفاصيل وعين المصمم. أؤمن أن الكود الجيد هو فنٌّ يحلّ مشكلة.",
+    "email": "ahmed@example.com",
+    "github": "https://github.com/ahmedsh",
+    "linkedin": "https://linkedin.com/in/ahmedsh",
+    "location": "الرياض، المملكة العربية السعودية",
+    "avatar": "https://avatars.githubusercontent.com/u/9919?v=4",
+    "skills": ["JavaScript", "React", "Vue.js", "Node.js", "CSS / Tailwind", "Git & GitHub", "Python", "Figma"]
+  },
+  "projects": [
+    {
+      "id": 1,
+      "title": "منصة تعليمية تفاعلية",
+      "description": "منصة لتعلم البرمجة تضم دروساً تفاعلية ومحرر كود مدمج ونظام تتبع تقدم المتعلم.",
+      "tech": ["React", "Node.js", "MongoDB"],
+      "github": "https://github.com/example/edu-platform",
+      "live": "https://edu-platform.example.com",
+      "featured": true
+    },
+    {
+      "id": 2,
+      "title": "تطبيق إدارة المهام",
+      "description": "تطبيق ويب لإدارة المشاريع والمهام بدعم Drag & Drop وتعاون الفريق في الوقت الفعلي.",
+      "tech": ["Vue.js", "Firebase", "Tailwind CSS"],
+      "github": "https://github.com/example/task-app",
+      "live": "https://tasks.example.com",
+      "featured": true
+    },
+    {
+      "id": 3,
+      "title": "واجهة تحليل البيانات",
+      "description": "لوحة تحكم لعرض وتحليل بيانات المبيعات مع رسوم بيانية تفاعلية وتقارير قابلة للتصدير.",
+      "tech": ["Python", "FastAPI", "Chart.js"],
+      "github": "https://github.com/example/data-dashboard",
+      "live": "",
+      "featured": false
+    },
+    {
+      "id": 4,
+      "title": "متجر إلكتروني حديث",
+      "description": "متجر كامل بنظام عربة التسوق والدفع الإلكتروني والإشعارات الفورية.",
+      "tech": ["Next.js", "Stripe", "PostgreSQL"],
+      "github": "https://github.com/example/e-shop",
+      "live": "https://shop.example.com",
+      "featured": false
+    }
+  ]
+}

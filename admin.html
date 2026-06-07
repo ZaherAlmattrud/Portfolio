@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم | بورتفوليو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c27;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43e97b;
+      --text: #e8e8f0;
+      --text-dim: #8888aa;
+      --border: #2a2a3d;
+      --radius: 12px;
+      --danger: #ff4757;
+      --success: #2ed573;
+      --font-ar: 'Cairo', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ar);
+      min-height: 100vh;
+    }
+
+    /* ── Lock Screen ── */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .lock-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      width: min(420px, 90vw);
+      text-align: center;
+    }
+
+    .lock-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .lock-card h2 {
+      font-size: 1.4rem;
+      font-weight: 900;
+      margin-bottom: .5rem;
+    }
+
+    .lock-card p {
+      color: var(--text-dim);
+      font-size: .9rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .85rem 1.2rem;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+      text-align: center;
+      letter-spacing: 3px;
+    }
+
+    .input-group input:focus { border-color: var(--accent); }
+
+    .lock-hint {
+      font-size: .75rem;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+      font-family: var(--font-mono);
+    }
+    .lock-hint span { color: var(--accent3); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      padding: .85rem 2rem;
+      border-radius: var(--radius);
+      font-family: var(--font-ar);
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .25s;
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #7c74ff; transform: translateY(-1px); }
+
+    .btn-success { background: var(--success); color: #0a0a0f; }
+    .btn-success:hover { opacity: .9; transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      width: auto;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-danger { background: var(--danger); color: #fff; width: auto; }
+    .btn-sm { padding: .5rem 1rem; font-size: .85rem; width: auto; }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: .85rem;
+      margin-top: .5rem;
+      min-height: 1.2em;
+    }
+
+    /* ── Admin Panel ── */
+    #admin-panel { display: none; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .header-brand .logo { font-family: var(--font-mono); color: var(--accent); font-size: .9rem; }
+    .header-brand .badge {
+      background: rgba(67,233,123,.15);
+      color: var(--accent3);
+      font-size: .7rem;
+      font-family: var(--font-mono);
+      padding: .2rem .6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(67,233,123,.25);
+    }
+
+    .header-actions { display: flex; gap: .75rem; align-items: center; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: .5rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-family: var(--font-ar);
+      font-size: .95rem;
+      font-weight: 600;
+      padding: .75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all .2s;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* ── Form ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .form-group { display: flex; flex-direction: column; gap: .4rem; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: .82rem;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .7rem 1rem;
+      color: var(--text);
+      font-family: var(--font-ar);
+      font-size: .92rem;
+      outline: none;
+      transition: border-color .2s;
+      width: 100%;
+    }
+    input:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 90px; }
+
+    /* ── Projects List ── */
+    .project-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .project-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .project-item-title {
+      font-weight: 700;
+      font-size: .95rem;
+    }
+
+    .project-item-actions { display: flex; gap: .5rem; }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      border-radius: 8px;
+      padding: .35rem .8rem;
+      font-size: .8rem;
+      font-family: var(--font-ar);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .project-fields { display: none; margin-top: 1rem; }
+    .project-fields.open { display: block; }
+
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .checkbox-wrap input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .85rem 1.8rem;
+      border-radius: var(--radius);
+      font-size: .9rem;
+      font-weight: 600;
+      z-index: 9999;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { border-color: rgba(46,213,115,.3); }
+    #toast.info    { border-color: rgba(108,99,255,.4); }
+
+    /* ── Download Banner ── */
+    #download-banner {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid rgba(46,213,115,.35);
+      border-radius: var(--radius);
+      padding: 1.2rem 2rem;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      z-index: 200;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      width: min(500px, 90vw);
+    }
+    #download-banner.show { display: flex; }
+
+    .banner-icon { font-size: 1.5rem; }
+    .banner-text { flex: 1; }
+    .banner-text strong { display: block; font-size: .95rem; margin-bottom: .2rem; }
+    .banner-text p { color: var(--text-dim); font-size: .82rem; }
+  </style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <span class="lock-icon">🔐</span>
+    <h2>لوحة التحكم</h2>
+    <p>أدخل كلمة المرور للوصول إلى مدير البورتفوليو</p>
+    <div class="input-group">
+      <input type="password" id="pwd-input" placeholder="••••••" autocomplete="off" />
+    </div>
+    <p class="lock-hint">كلمة المرور الافتراضية: <span>admin123</span></p>
+    <button class="btn btn-primary" onclick="unlock()">دخول</button>
+    <p class="error-msg" id="lock-error"></p>
+  </div>
+  <a href="index.html" style="color: var(--text-dim); font-size:.85rem; text-decoration:none;">← العودة للبورتفوليو</a>
+</div>
+
+<!-- DOWNLOAD BANNER -->
+<div id="download-banner">
+  <span class="banner-icon">✅</span>
+  <div class="banner-text">
+    <strong>تم إنشاء data.json بنجاح!</strong>
+    <p>حمّل الملف وارفعه إلى مستودع GitHub الخاص بك.</p>
+  </div>
+  <a id="download-link" class="btn btn-success btn-sm">تحميل</a>
+  <button onclick="closeBanner()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1.2rem;">✕</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <header>
+    <div class="header-brand">
+      <span class="logo">{ admin }</span>
+      <span class="badge">● مسجّل الدخول</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="generateJSON()">⬇ إنشاء JSON وتحميله</button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('personal', this)">البيانات الشخصية</button>
+      <button class="tab-btn" onclick="switchTab('projects', this)">المشاريع</button>
+      <button class="tab-btn" onclick="switchTab('guide', this)">دليل الرفع</button>
+    </div>
+
+    <!-- Personal Tab -->
+    <div class="tab-pane active" id="tab-personal">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">👤 البيانات الشخصية</span>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>الاسم الكامل</label>
+            <input type="text" id="p-name" />
+          </div>
+          <div class="form-group">
+            <label>المسمى الوظيفي</label>
+            <input type="text" id="p-title" />
+          </div>
+          <div class="form-group full">
+            <label>النبذة الشخصية</label>
+            <textarea id="p-bio"></textarea>
+          </div>
+          <div class="form-group">
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="p-email" />
+          </div>
+          <div class="form-group">
+            <label>رابط GitHub</label>
+            <input type="url" id="p-github" />
+          </div>
+          <div class="form-group">
+            <label>رابط LinkedIn</label>
+            <input type="url" id="p-linkedin" />
+          </div>
+          <div class="form-group">
+            <label>الموقع الجغرافي</label>
+            <input type="text" id="p-location" />
+          </div>
+          <div class="form-group">
+            <label>رابط الصورة الشخصية</label>
+            <input type="url" id="p-avatar" />
+          </div>
+          <div class="form-group full">
+            <label>المهارات (افصل بينها بفاصلة)</label>
+            <input type="text" id="p-skills" placeholder="JavaScript, React, Node.js" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects Tab -->
+    <div class="tab-pane" id="tab-projects">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+        <span style="font-weight:700; font-size:1rem;">المشاريع</span>
+        <button class="btn btn-primary btn-sm" onclick="addProject()">+ إضافة مشروع</button>
+      </div>
+      <div id="projects-list"></div>
+    </div>
+
+    <!-- Guide Tab -->
+    <div class="tab-pane" id="tab-guide">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:1.5rem; font-size:1.1rem;">📖 كيفية تحديث البورتفوليو على GitHub</div>
+        <ol style="list-style:none; counter-reset: steps; display:flex; flex-direction:column; gap:1.5rem;">
+          <li style="display:flex; gap:1rem; counter-increment:steps;">
+            <span style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.85rem; flex-shrink:0;">1</span>
+            <div>
+              <strong>عدّل البيانات في لوحة التحكم</strong>
+              <p style="color:var(--text-dim); font-size:.88rem; margin-top:.3rem;">أجرِ تعديلاتك في تبويبي "البيانات الشخصية" و"المشاريع".</p>
+            </div>
+          </li>
+          <li style="display:flex; gap:1rem; counter-increment:steps;">
+            <span style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.85rem; flex-shrink:0;">2</span>
+            <div>
+              <strong>انقر "إنشاء JSON وتحميله"</strong>
+              <p style="color:var(--text-dim); font-size:.88rem; margin-top:.3rem;">الزر موجود في الأعلى أو في الأسفل. سيُنشئ ملف <code style="color:var(--accent3)">data.json</code> ويبدأ التحميل تلقائياً.</p>
+            </div>
+          </li>
+          <li style="display:flex; gap:1rem; counter-increment:steps;">
+            <span style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.85rem; flex-shrink:0;">3</span>
+            <div>
+              <strong>افتح مستودع GitHub الخاص بك</strong>
+              <p style="color:var(--text-dim); font-size:.88rem; margin-top:.3rem;">اذهب إلى <code style="color:var(--accent3)">github.com / اسمك / repository</code> واضغط على ملف <code style="color:var(--accent3)">data.json</code>.</p>
+            </div>
+          </li>
+          <li style="display:flex; gap:1rem; counter-increment:steps;">
+            <span style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.85rem; flex-shrink:0;">4</span>
+            <div>
+              <strong>ارفع الملف الجديد</strong>
+              <p style="color:var(--text-dim); font-size:.88rem; margin-top:.3rem;">اضغط أيقونة القلم (Edit) ثم الصق المحتوى، أو استخدم زر "Upload Files" لاستبدال الملف القديم بالجديد.</p>
+            </div>
+          </li>
+          <li style="display:flex; gap:1rem; counter-increment:steps;">
+            <span style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.85rem; flex-shrink:0;">5</span>
+            <div>
+              <strong>Commit التغييرات</strong>
+              <p style="color:var(--text-dim); font-size:.88rem; margin-top:.3rem;">أضف رسالة Commit مثل: <em>"تحديث data.json"</em> واضغط "Commit changes". سيتحدث الموقع خلال ثوانٍ.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div class="card" style="border-color:rgba(108,99,255,.25);">
+        <p style="font-size:.88rem; color:var(--text-dim); line-height:1.8;">
+          <strong style="color:var(--text);">💡 نصيحة للمطورين:</strong> يمكنك استخدام <code style="color:var(--accent3)">git pull → edit → git push</code> محلياً بدلاً من واجهة GitHub إذا كنت تفضل العمل بـ CLI.
+        </p>
+      </div>
+    </div>
+
+    <!-- Bottom Action -->
+    <div style="text-align:center; margin-top:2rem;">
+      <button class="btn btn-success" style="max-width:320px;" onclick="generateJSON()">
+        ⬇ إنشاء data.json وتحميله
+      </button>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const ADMIN_PASSWORD = 'admin123'; // ← غيّر كلمة المرور هنا
+  let portfolioData = null;
+
+  /* ── Lock ── */
+  document.getElementById('pwd-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') unlock();
+  });
+
+  function unlock() {
+    const val = document.getElementById('pwd-input').value;
+    if (val === ADMIN_PASSWORD) {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      loadData();
+    } else {
+      const err = document.getElementById('lock-error');
+      err.textContent = '❌ كلمة المرور غير صحيحة';
+      document.getElementById('pwd-input').value = '';
+      setTimeout(() => err.textContent = '', 2500);
+    }
+  }
+
+  function logout() {
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('lock-screen').style.display = 'flex';
+    document.getElementById('pwd-input').value = '';
+  }
+
+  /* ── Load data.json ── */
+  async function loadData() {
+    try {
+      const res = await fetch('data.json');
+      portfolioData = await res.json();
+    } catch {
+      // Default structure if file not found
+      portfolioData = {
+        personal: { name:'', title:'', bio:'', email:'', github:'', linkedin:'', location:'', avatar:'', skills:[] },
+        projects: []
+      };
+      showToast('⚠️ لم يُعثر على data.json — تم تهيئة بيانات فارغة', 'info');
+    }
+    populateForm();
+  }
+
+  function populateForm() {
+    const p = portfolioData.personal;
+    document.getElementById('p-name').value     = p.name     || '';
+    document.getElementById('p-title').value    = p.title    || '';
+    document.getElementById('p-bio').value      = p.bio      || '';
+    document.getElementById('p-email').value    = p.email    || '';
+    document.getElementById('p-github').value   = p.github   || '';
+    document.getElementById('p-linkedin').value = p.linkedin || '';
+    document.getElementById('p-location').value = p.location || '';
+    document.getElementById('p-avatar').value   = p.avatar   || '';
+    document.getElementById('p-skills').value   = (p.skills || []).join(', ');
+    renderProjectsList();
+  }
+
+  /* ── Projects ── */
+  function renderProjectsList() {
+    const list = document.getElementById('projects-list');
+    list.innerHTML = '';
+    (portfolioData.projects || []).forEach((proj, i) => {
+      const div = document.createElement('div');
+      div.className = 'project-item';
+      div.id = `proj-item-${i}`;
+      div.innerHTML = `
+        <div class="project-item-header">
+          <span class="project-item-title">📁 ${proj.title || 'مشروع جديد'}</span>
+          <div class="project-item-actions">
+            <button class="toggle-btn" onclick="toggleProject(${i})">تعديل ↕</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProject(${i})">حذف</button>
+          </div>
+        </div>
+        <div class="project-fields" id="proj-fields-${i}">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>اسم المشروع</label>
+              <input type="text" id="proj-title-${i}" value="${escHtml(proj.title)}"
+                oninput="updateProjectTitle(${i}, this.value)" />
+            </div>
+            <div class="form-group">
+              <label>التقنيات (مفصولة بفاصلة)</label>
+              <input type="text" id="proj-tech-${i}" value="${(proj.tech||[]).join(', ')}" />
+            </div>
+            <div class="form-group full">
+              <label>الوصف</label>
+              <textarea id="proj-desc-${i}">${escHtml(proj.description)}</textarea>
+            </div>
+            <div class="form-group">
+              <label>رابط GitHub</label>
+              <input type="url" id="proj-github-${i}" value="${escHtml(proj.github||'')}" />
+            </div>
+            <div class="form-group">
+              <label>رابط المعاينة الحية</label>
+              <input type="url" id="proj-live-${i}" value="${escHtml(proj.live||'')}" />
+            </div>
+            <div class="form-group">
+              <label class="checkbox-wrap">
+                <input type="checkbox" id="proj-featured-${i}" ${proj.featured ? 'checked':''} />
+                مشروع مميز ⭐
+              </label>
+            </div>
+          </div>
+        </div>`;
+      list.appendChild(div);
+    });
+  }
+
+  function toggleProject(i) {
+    document.getElementById(`proj-fields-${i}`).classList.toggle('open');
+  }
+
+  function updateProjectTitle(i, val) {
+    document.querySelector(`#proj-item-${i} .project-item-title`).textContent = `📁 ${val || 'مشروع جديد'}`;
+  }
+
+  function addProject() {
+    portfolioData.projects.push({
+      id: Date.now(),
+      title: 'مشروع جديد',
+      description: '',
+      tech: [],
+      github: '',
+      live: '',
+      featured: false
+    });
+    renderProjectsList();
+    // auto-open last
+    const idx = portfolioData.projects.length - 1;
+    document.getElementById(`proj-fields-${idx}`).classList.add('open');
+    document.getElementById(`proj-title-${idx}`).focus();
+  }
+
+  function deleteProject(i) {
+    if (!confirm('هل أنت متأكد من حذف هذا المشروع؟')) return;
+    portfolioData.projects.splice(i, 1);
+    renderProjectsList();
+    showToast('🗑 تم حذف المشروع', 'info');
+  }
+
+  /* ── Collect & Generate ── */
+  function collectData() {
+    // Personal
+    portfolioData.personal = {
+      name:     document.getElementById('p-name').value.trim(),
+      title:    document.getElementById('p-title').value.trim(),
+      bio:      document.getElementById('p-bio').value.trim(),
+      email:    document.getElementById('p-email').value.trim(),
+      github:   document.getElementById('p-github').value.trim(),
+      linkedin: document.getElementById('p-linkedin').value.trim(),
+      location: document.getElementById('p-location').value.trim(),
+      avatar:   document.getElementById('p-avatar').value.trim(),
+      skills:   document.getElementById('p-skills').value
+                  .split(',').map(s => s.trim()).filter(Boolean)
+    };
+
+    // Projects
+    const count = portfolioData.projects.length;
+    portfolioData.projects = portfolioData.projects.map((proj, i) => ({
+      id:          proj.id || i + 1,
+      title:       document.getElementById(`proj-title-${i}`)?.value.trim()    || proj.title,
+      description: document.getElementById(`proj-desc-${i}`)?.value.trim()     || proj.description,
+      tech:        (document.getElementById(`proj-tech-${i}`)?.value || '')
+                     .split(',').map(s => s.trim()).filter(Boolean),
+      github:      document.getElementById(`proj-github-${i}`)?.value.trim()   || '',
+      live:        document.getElementById(`proj-live-${i}`)?.value.trim()     || '',
+      featured:    document.getElementById(`proj-featured-${i}`)?.checked ?? false
+    }));
+
+    return portfolioData;
+  }
+
+  function generateJSON() {
+    const data = collectData();
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+
+    const link = document.getElementById('download-link');
+    link.href = url;
+    link.download = 'data.json';
+    link.click();  // trigger download automatically
+
+    document.getElementById('download-banner').classList.add('show');
+    showToast('✅ تم إنشاء data.json — تحقق من تنزيلاتك!', 'success');
+  }
+
+  function closeBanner() {
+    document.getElementById('download-banner').classList.remove('show');
+  }
+
+  /* ── Tabs ── */
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* ── Toast ── */
+  function showToast(msg, type = 'info') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `show ${type}`;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.className = '', 3500);
+  }
+
+  function escHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
